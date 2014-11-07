@@ -4,7 +4,8 @@
   "description": "utils for node.js streaming api ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --recursive -R spec test",
+    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "repository": {
     "type": "git",
@@ -17,5 +18,15 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/airtoxin/stream-utils/issues"
+  },
+  "dependencies": {
+    "lodash": "*"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "stream-spec": "*",
+    "istanbul": "*",
+    "coveralls": "*",
+    "mocha-lcov-reporter": "*"
   }
 }
