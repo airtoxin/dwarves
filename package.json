@@ -1,0 +1,21 @@
+{
+  "name": "stream-utils",
+  "version": "0.0.0",
+  "description": "utils for node.js streaming api ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/airtoxin/stream-utils.git"
+  },
+  "keywords": [
+    "stream"
+  ],
+  "author": "airtoxin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/airtoxin/stream-utils/issues"
+  }
+}
