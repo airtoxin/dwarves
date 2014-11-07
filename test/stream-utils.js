@@ -70,7 +70,7 @@ describe( 'stream-utils', function () {
 
 	describe( 'reduceStream', function () {
 		it( 'is transform stream', function ( done ) {
-			var reducer = function ( accum, data, callback ) { callback(); };
+			var reducer = function ( data, callback ) { callback(); };
 			var r = stream.reduceStream( null, reducer );
 			assert.ok( _.has( r, '_transform' ) );
 			spec( r )
@@ -130,6 +130,64 @@ describe( 'stream-utils', function () {
 			var r = stream.reduceStream( initializer, reducer );
 			s.pipe( r ).on( 'data', function ( data ) {
 				assert.equal( data, _.reduce( arr, function ( sum, num ) { return sum + num; } ) );
+				done();
+			} );
+		} );
+	} );
+
+	describe( 'groupByStream', function () {
+		it( 'is transform stream', function ( done ) {
+			var shuffler = function ( data, callback ) { callback( 'a' ); };
+			var g = stream.groupByStream( null, null, shuffler );
+			assert.ok( _.has( g, '_transform' ) );
+			spec( g )
+				.duplex( { strict: true } )
+				.validateOnExit();
+			done();
+		} );
+
+		it( 'calls finish event on all data processed', function ( done ) {
+			var arr = _.range(1000);
+			var s = stream.toStream( arr );
+			var shuffler = function ( data, callback ) { callback( 'a' ); };
+			var g = stream.groupByStream( null, null, shuffler );
+			s.pipe( g ).on( 'finish', function () {
+				done();
+			} );
+		} );
+
+		it( 'processes data uning shuffler callback', function ( done ) {
+			var arr = _.range(1000);
+			var s = stream.toStream( arr );
+			var shuffler = function ( data, callback ) { callback( 'a' ); };
+			var g = stream.groupByStream( 'obj-key', 'obj-value', shuffler );
+
+			s.pipe( g ).on( 'data', function ( data ) {
+				assert.deepEqual( data, { 'obj-key': 'a', 'obj-value': arr } );
+				done();
+			} );
+		} );
+
+		it( 'default key is k', function ( done ) {
+			var arr = _.range(1000);
+			var s = stream.toStream( arr );
+			var shuffler = function ( data, callback ) { callback( 'a' ); };
+			var g = stream.groupByStream( null, 'obj-value', shuffler );
+
+			s.pipe( g ).on( 'data', function ( data ) {
+				assert.deepEqual( data, { 'k': 'a', 'obj-value': arr } );
+				done();
+			} );
+		} );
+
+		it( 'default value is v', function ( done ) {
+			var arr = _.range(1000);
+			var s = stream.toStream( arr );
+			var shuffler = function ( data, callback ) { callback( 'a' ); };
+			var g = stream.groupByStream( 'obj-key', null, shuffler );
+
+			s.pipe( g ).on( 'data', function ( data ) {
+				assert.deepEqual( data, { 'obj-key': 'a', 'v': arr } );
 				done();
 			} );
 		} );
