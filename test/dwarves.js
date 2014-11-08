@@ -184,6 +184,40 @@ describe( 'dwarves', function () {
 		} );
 	} );
 
+	describe( 'shuffleStream', function () {
+		it( 'is transform stream', function ( done ) {
+			var s = stream.shuffleStream();
+			assert.ok( _.has( s, '_transform' ) );
+			spec( s )
+				.duplex( { strict: true } )
+				.validateOnExit();
+			done();
+		} );
+
+		it( 'calls finish event on all data processed', function ( done ) {
+			var d = stream.toStream( _.range( 1000 ) );
+			var s = stream.shuffleStream();
+			d.pipe( s ).on( 'finish', function () {
+				done();
+			} );
+		} );
+
+		it( 'shuffles data', function ( done ) {
+			var sampleSize = 1000;
+			var arr = _.range( sampleSize );
+			var d = stream.toStream( arr );
+			var s = stream.shuffleStream();
+			var processed = [];
+			d.pipe( s ).on( 'data', function ( data ) {
+				processed.push( data );
+			} ).on( 'finish', function () {
+				assert.equal( processed.length, sampleSize );
+				assert.deepEqual( _.difference( processed, arr ), [] );
+				done();
+			} );
+		} );
+	} );
+
 	describe( 'groupByStream', function () {
 		it( 'is transform stream', function ( done ) {
 			var shuffler = function ( data, callback ) { callback( 'a' ); };
