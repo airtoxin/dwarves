@@ -1,13 +1,13 @@
-var assert = require( 'assert' ),
-	_      = require( 'lodash' ),
-	spec   = require( 'stream-spec' ),
-	stream = require( '../' );
+var assert  = require( 'assert' ),
+	_       = require( 'lodash' ),
+	spec    = require( 'stream-spec' ),
+	dwarves = require( '../' );
 
 describe( 'dwarves', function () {
 	describe( 'toStream', function () {
 		it( 'is readable stream', function ( done ) {
 			var arr = [ 'start', 1, 2, 3, 4, 5, 'end' ];
-			spec( stream.toStream( arr ) )
+			spec( dwarves.toStream( arr ) )
 				.readable()
 				.pausable( { strict: true } )
 				.validateOnExit();
@@ -16,7 +16,7 @@ describe( 'dwarves', function () {
 
 		it( 'streams each data of array', function ( done ) {
 			var arr = [ 'start', 1, 2, 3, 4, 5, 'end' ];
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 			_.each( arr, function ( data ) {
 				assert.equal( s.read(), data );
 			} );
@@ -25,7 +25,7 @@ describe( 'dwarves', function () {
 
 		it( 'end', function ( done ) {
 			var arr = [ 'start', 1, 2, 3, 4, 5, 'end' ];
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 			s.on( 'data', function(){} ).on( 'end', done );
 		} )
 	} );
@@ -33,7 +33,7 @@ describe( 'dwarves', function () {
 	describe( 'mapStream', function () {
 		it( 'is transform stream', function ( done ) {
 			var mapper = function ( data, callback ) { callback(); };
-			var m = stream.mapStream( mapper );
+			var m = dwarves.mapStream( mapper );
 			assert.ok( _.has( m, '_transform' ) );
 			spec( m )
 				.duplex( { strict: true } )
@@ -43,9 +43,9 @@ describe( 'dwarves', function () {
 
 		it( 'calls finish event on all data processed', function ( done ) {
 			var arr = _.range(1000);
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 			var mapper = function ( data, callback ) { return callback(); };
-			var m = stream.mapStream( mapper );
+			var m = dwarves.mapStream( mapper );
 			s.pipe( m ).on( 'finish', function () {
 				done();
 			} );
@@ -58,9 +58,9 @@ describe( 'dwarves', function () {
 				callback();
 			};
 			var arr = _.range(1000);
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 
-			var m = stream.mapStream( mapper );
+			var m = dwarves.mapStream( mapper );
 			s.pipe( m ).on( 'finish', function () {
 				assert.deepEqual( processed, arr );
 				done();
@@ -71,7 +71,7 @@ describe( 'dwarves', function () {
 	describe( 'reduceStream', function () {
 		it( 'is transform stream', function ( done ) {
 			var reducer = function ( data, callback ) { callback(); };
-			var r = stream.reduceStream( null, reducer );
+			var r = dwarves.reduceStream( null, reducer );
 			assert.ok( _.has( r, '_transform' ) );
 			spec( r )
 				.duplex( { strict: true } )
@@ -81,9 +81,9 @@ describe( 'dwarves', function () {
 
 		it( 'calls finish event on all data processed', function ( done ) {
 			var arr = _.range(1000);
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 			var reducer = function ( accum, data, callback ) { callback(); };
-			var r = stream.reduceStream( null, reducer );
+			var r = dwarves.reduceStream( null, reducer );
 			s.pipe( r ).on( 'finish', function () {
 				done();
 			} );
@@ -96,9 +96,9 @@ describe( 'dwarves', function () {
 				callback();
 			};
 			var arr = _.range(1000);
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 
-			var r = stream.reduceStream( null, reducer );
+			var r = dwarves.reduceStream( null, reducer );
 			s.pipe( r ).on( 'finish', function () {
 				assert.deepEqual( processed, arr );
 				done();
@@ -112,9 +112,9 @@ describe( 'dwarves', function () {
 				done();
 			};
 			var arr = _.range(1000);
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 
-			var r = stream.reduceStream( initializer, reducer );
+			var r = dwarves.reduceStream( initializer, reducer );
 			s.pipe( r );
 		} );
 
@@ -125,9 +125,9 @@ describe( 'dwarves', function () {
 				callback( accum );
 			};
 			var arr = _.range(1000);
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 
-			var r = stream.reduceStream( initializer, reducer );
+			var r = dwarves.reduceStream( initializer, reducer );
 			s.pipe( r ).on( 'data', function ( data ) {
 				assert.equal( data, _.reduce( arr, function ( sum, num ) { return sum + num; } ) );
 				done();
@@ -137,7 +137,7 @@ describe( 'dwarves', function () {
 
 	describe( 'sampleStream', function () {
 		it( 'is transform stream', function ( done ) {
-			var s = stream.sampleStream();
+			var s = dwarves.sampleStream();
 			assert.ok( _.has( s, '_transform' ) );
 			spec( s )
 				.duplex( { strict: true } )
@@ -146,8 +146,8 @@ describe( 'dwarves', function () {
 		} );
 
 		it( 'calls finish event on all data processed', function ( done ) {
-			var d = stream.toStream( _.range( 1000 ) );
-			var s = stream.sampleStream();
+			var d = dwarves.toStream( _.range( 1000 ) );
+			var s = dwarves.sampleStream();
 			d.pipe( s ).on( 'finish', function () {
 				done();
 			} );
@@ -157,8 +157,8 @@ describe( 'dwarves', function () {
 			var batchSize = 30;
 			var dataSize = 1000;
 			var sampleSize = Math.ceil( dataSize / batchSize );
-			var d = stream.toStream( _.range( dataSize ) );
-			var s = stream.sampleStream( batchSize );
+			var d = dwarves.toStream( _.range( dataSize ) );
+			var s = dwarves.sampleStream( batchSize );
 			var processed = [];
 			d.pipe( s ).on( 'data', function ( data ) {
 				processed.push( data );
@@ -172,8 +172,8 @@ describe( 'dwarves', function () {
 			var batchSize = 10;
 			var dataSize = 1000;
 			var sampleSize = Math.ceil( dataSize / batchSize );
-			var d = stream.toStream( _.range( dataSize ) );
-			var s = stream.sampleStream();
+			var d = dwarves.toStream( _.range( dataSize ) );
+			var s = dwarves.sampleStream();
 			var processed = [];
 			d.pipe( s ).on( 'data', function ( data ) {
 				processed.push( data );
@@ -186,7 +186,7 @@ describe( 'dwarves', function () {
 
 	describe( 'shuffleStream', function () {
 		it( 'is transform stream', function ( done ) {
-			var s = stream.shuffleStream();
+			var s = dwarves.shuffleStream();
 			assert.ok( _.has( s, '_transform' ) );
 			spec( s )
 				.duplex( { strict: true } )
@@ -195,8 +195,8 @@ describe( 'dwarves', function () {
 		} );
 
 		it( 'calls finish event on all data processed', function ( done ) {
-			var d = stream.toStream( _.range( 1000 ) );
-			var s = stream.shuffleStream();
+			var d = dwarves.toStream( _.range( 1000 ) );
+			var s = dwarves.shuffleStream();
 			d.pipe( s ).on( 'finish', function () {
 				done();
 			} );
@@ -205,8 +205,8 @@ describe( 'dwarves', function () {
 		it( 'shuffles data', function ( done ) {
 			var sampleSize = 1000;
 			var arr = _.range( sampleSize );
-			var d = stream.toStream( arr );
-			var s = stream.shuffleStream( 30 );
+			var d = dwarves.toStream( arr );
+			var s = dwarves.shuffleStream( 30 );
 			var processed = [];
 			d.pipe( s ).on( 'data', function ( data ) {
 				processed.push( data );
@@ -221,7 +221,7 @@ describe( 'dwarves', function () {
 	describe( 'groupByStream', function () {
 		it( 'is transform stream', function ( done ) {
 			var shuffler = function ( data, callback ) { callback( 'a' ); };
-			var g = stream.groupByStream( null, null, shuffler );
+			var g = dwarves.groupByStream( null, null, shuffler );
 			assert.ok( _.has( g, '_transform' ) );
 			spec( g )
 				.duplex( { strict: true } )
@@ -231,9 +231,9 @@ describe( 'dwarves', function () {
 
 		it( 'calls finish event on all data processed', function ( done ) {
 			var arr = _.range(1000);
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 			var shuffler = function ( data, callback ) { callback( 'a' ); };
-			var g = stream.groupByStream( null, null, shuffler );
+			var g = dwarves.groupByStream( null, null, shuffler );
 			s.pipe( g ).on( 'finish', function () {
 				done();
 			} );
@@ -241,9 +241,9 @@ describe( 'dwarves', function () {
 
 		it( 'processes data uning shuffler callback', function ( done ) {
 			var arr = _.range(1000);
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 			var shuffler = function ( data, callback ) { callback( 'a' ); };
-			var g = stream.groupByStream( 'obj-key', 'obj-value', shuffler );
+			var g = dwarves.groupByStream( 'obj-key', 'obj-value', shuffler );
 
 			s.pipe( g ).on( 'data', function ( data ) {
 				assert.deepEqual( data, { 'obj-key': 'a', 'obj-value': arr } );
@@ -253,9 +253,9 @@ describe( 'dwarves', function () {
 
 		it( 'default key is k', function ( done ) {
 			var arr = _.range(1000);
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 			var shuffler = function ( data, callback ) { callback( 'a' ); };
-			var g = stream.groupByStream( null, 'obj-value', shuffler );
+			var g = dwarves.groupByStream( null, 'obj-value', shuffler );
 
 			s.pipe( g ).on( 'data', function ( data ) {
 				assert.deepEqual( data, { 'k': 'a', 'obj-value': arr } );
@@ -265,9 +265,9 @@ describe( 'dwarves', function () {
 
 		it( 'default value is v', function ( done ) {
 			var arr = _.range(1000);
-			var s = stream.toStream( arr );
+			var s = dwarves.toStream( arr );
 			var shuffler = function ( data, callback ) { callback( 'a' ); };
-			var g = stream.groupByStream( 'obj-key', null, shuffler );
+			var g = dwarves.groupByStream( 'obj-key', null, shuffler );
 
 			s.pipe( g ).on( 'data', function ( data ) {
 				assert.deepEqual( data, { 'obj-key': 'a', 'v': arr } );
