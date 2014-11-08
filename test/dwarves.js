@@ -206,7 +206,7 @@ describe( 'dwarves', function () {
 			var sampleSize = 1000;
 			var arr = _.range( sampleSize );
 			var d = stream.toStream( arr );
-			var s = stream.shuffleStream();
+			var s = stream.shuffleStream( 30 );
 			var processed = [];
 			d.pipe( s ).on( 'data', function ( data ) {
 				processed.push( data );
