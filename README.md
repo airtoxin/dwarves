@@ -1,4 +1,4 @@
-stream-utils
+dwarves
 ============
 
-utils for node.js streaming api
+util streams

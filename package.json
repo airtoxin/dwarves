@@ -1,7 +1,7 @@
 {
-  "name": "stream-utils",
-  "version": "0.0.0",
-  "description": "utils for node.js streaming api ",
+  "name": "dwarves",
+  "version": "0.0.1",
+  "description": "util streams",
   "main": "index.js",
   "scripts": {
     "test": "mocha --recursive -R spec test",
@@ -9,15 +9,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/airtoxin/stream-utils.git"
+    "url": "git://github.com/airtoxin/dwarves.git"
   },
   "keywords": [
-    "stream"
+    "stream",
+    "util"
   ],
   "author": "airtoxin",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/airtoxin/stream-utils/issues"
+    "url": "https://github.com/airtoxin/dwarves/issues"
   },
   "dependencies": {
     "lodash": "*"

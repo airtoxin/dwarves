@@ -3,7 +3,7 @@ var assert = require( 'assert' ),
 	spec   = require( 'stream-spec' ),
 	stream = require( '../' );
 
-describe( 'stream-utils', function () {
+describe( 'dwarves', function () {
 	describe( 'toStream', function () {
 		it( 'is readable stream', function ( done ) {
 			var arr = [ 'start', 1, 2, 3, 4, 5, 'end' ];

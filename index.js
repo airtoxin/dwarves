@@ -1,1 +1,1 @@
-module.exports = require( './lib/stream-utils' );
+module.exports = require( './lib/dwarves' );
