@@ -135,6 +135,55 @@ describe( 'dwarves', function () {
 		} );
 	} );
 
+	describe( 'sampleStream', function () {
+		it( 'is transform stream', function ( done ) {
+			var s = stream.sampleStream();
+			assert.ok( _.has( s, '_transform' ) );
+			spec( s )
+				.duplex( { strict: true } )
+				.validateOnExit();
+			done();
+		} );
+
+		it( 'calls finish event on all data processed', function ( done ) {
+			var d = stream.toStream( _.range( 1000 ) );
+			var s = stream.sampleStream();
+			d.pipe( s ).on( 'finish', function () {
+				done();
+			} );
+		} );
+
+		it( 'samples data per batchSize', function ( done ) {
+			var batchSize = 30;
+			var dataSize = 1000;
+			var sampleSize = Math.ceil( dataSize / batchSize );
+			var d = stream.toStream( _.range( dataSize ) );
+			var s = stream.sampleStream( batchSize );
+			var processed = [];
+			d.pipe( s ).on( 'data', function ( data ) {
+				processed.push( data );
+			} ).on( 'finish', function () {
+				assert.equal( processed.length, sampleSize );
+				done();
+			} );
+		} );
+
+		it( 'default batchSize is 10', function ( done ) {
+			var batchSize = 10;
+			var dataSize = 1000;
+			var sampleSize = Math.ceil( dataSize / batchSize );
+			var d = stream.toStream( _.range( dataSize ) );
+			var s = stream.sampleStream();
+			var processed = [];
+			d.pipe( s ).on( 'data', function ( data ) {
+				processed.push( data );
+			} ).on( 'finish', function () {
+				assert.equal( processed.length, sampleSize );
+				done();
+			} );
+		} );
+	} );
+
 	describe( 'groupByStream', function () {
 		it( 'is transform stream', function ( done ) {
 			var shuffler = function ( data, callback ) { callback( 'a' ); };
